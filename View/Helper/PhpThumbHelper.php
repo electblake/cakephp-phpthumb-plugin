@@ -46,7 +46,7 @@ class PhpThumbHelper extends HtmlHelper {
     }
     
     private function image_is_cached()    {
-        if(is_file($this->cache_filename))    {
+        if(is_file($this->cache_filename)) {
             return true;
         }
         return false;
@@ -64,6 +64,9 @@ class PhpThumbHelper extends HtmlHelper {
         }
         
         if($this->php_thumb->GenerateThumbnail()) {
+            if (!is_writable(dirname($this->cache_filename))) {
+              $this->error = dirname($this->cache_filename).' is not writable!';
+            }
             $this->php_thumb->RenderToFile($this->cache_filename);
         } else {
             $this->error = 1;
@@ -73,9 +76,10 @@ class PhpThumbHelper extends HtmlHelper {
     
     private function get_thumb_data()    {
     	$this->thumb_data['error'] = $this->error;
-    	
+				
         if($this->error)    {
             $this->thumb_data['error_detail'] = $this->error_detail;
+    				trigger_error($this->error_detail, E_USER_NOTICE);	
             $this->thumb_data['src'] = $this->options['error_image_path'];
         } else    {
             $this->thumb_data['src'] = $this->options['display_path'] . '/' . substr($this->cache_filename, strrpos($this->cache_filename, DS) + 1, strlen($this->cache_filename));
