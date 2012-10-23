@@ -62,7 +62,6 @@ class PhpThumbHelper extends HtmlHelper {
                 $this->php_thumb->setParameter($var, $this->options[$var]);
             }
         }
-        
         if($this->php_thumb->GenerateThumbnail()) {
             $this->php_thumb->RenderToFile($this->cache_filename);
         } else {
@@ -132,11 +131,17 @@ class PhpThumbHelper extends HtmlHelper {
         if (empty($thumbs_path)) {
             return false;
         }
+        
         $pathOptions = array(
             'save_path' => WWW_ROOT . $thumbs_path,
             'display_path' => '/' . $thumbs_path,
             'error_image_path' => Configure::read('PhpThumb.error_image_path')
         );
+        
+				if (!is_writable(dirname($pathOptions['save_path']))) {
+					trigger_error(__d('cake_dev', '"%s" directory is NOT writable.', dirname($pathOptions['save_path'])), E_USER_NOTICE);
+				}
+        
         if (!empty($options['model'])) {
             // model images from MeioUpload
             if (empty($options['field'])) {
@@ -173,6 +178,7 @@ class PhpThumbHelper extends HtmlHelper {
     function thumbnail($image, $options, $htmlOptions = array()) {
         $thumbnail = $this->generateThumbnail($image, $options);
         if (!empty($thumbnail['error'])) {
+            $this->Session->setFlash('Error creating thumbnail: '.$thumbnail['error']);
             return false;
         }
         return $this->image($thumbnail['src'], array_merge(
