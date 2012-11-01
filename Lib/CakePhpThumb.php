@@ -12,10 +12,12 @@ class CakePhpThumb {
     private $error_detail;
     
     private function init($options = array())    {
-        $this->options = $options;
-        $this->set_file_extension();
-        $this->thumb_data = array();
-        $this->error = 0;
+      App::import('Vendor', 'PhpThumb.PhpThumb', array('file' => 'phpThumb'.DS.'phpthumb.class.php'));
+      Configure::load('phpthumb');
+      $this->options = $options;
+      $this->set_file_extension();
+      $this->thumb_data = array();
+      $this->error = 0;
     }
     
     private function set_file_extension()    {
