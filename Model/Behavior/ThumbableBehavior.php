@@ -5,7 +5,7 @@ class ThumbableBehavior extends ModelBehavior {
 
 
 	protected $_defaults = array(
-	 'field' => 'image_path',
+	 'fields' => array('image_path'),
 	 'styles' => array(
 	   'tiny' => array(
 	     'w' => 80,
@@ -52,26 +52,29 @@ class ThumbableBehavior extends ModelBehavior {
       	
       	if (!empty($row[$this->alias])) {
           $obj = $row[$this->alias];
-        	if (!empty($obj[$this->getField()])) {
-          	$image_path = $results[$i][$this->alias][$this->getField()];
-
-          	if (!empty($image_path) and trim($image_path)) {            	
-            	foreach ($styles as $name => $phpThOptions) {
-              	$emitName = strtolower($name).'_thumb_path';
-              	$results[$i][$this->alias][$emitName] = $this->PhpThumb->url($image_path, $phpThOptions);
+          foreach ($this->getFields() as $field) {
+            if (!empty($obj[$field])) {
+              
+            	$image_path = $results[$i][$this->alias][$field];
+            
+            	if (!empty($image_path) and trim($image_path)) {            	
+              	foreach ($styles as $name => $phpThOptions) {
+                	$emitName = $field.'_'.strtolower($name).'_thumb_path';
+                	$results[$i][$this->alias][$emitName] = $this->PhpThumb->url($image_path, $phpThOptions);
+              	}
+              	
+            	} else {
+              	
+              	// image source field is empty yeo
+              	
             	}
             	
-          	} else {
+            } else {
             	
-            	// image source field is empty yeo
+            	// can't find image source field
             	
-          	}
-          	
-        	} else {
-          	
-          	// can't find image source field
-          	
-        	}
+            } 
+          }
       	}
     	}
     	
@@ -82,8 +85,14 @@ class ThumbableBehavior extends ModelBehavior {
   	
 	}
 	
-	public function getField() {
-  	return (string)$this->settings[$this->alias]['field'];
+	public function getFields() {
+	  $fields = $this->settings[$this->alias]['fields'];
+	  
+	  if (!is_array($fields)) {
+  	  $fields = array($fields);
+	  }
+	  
+  	return $fields;
 	}
 	
 	public function getStyles() {
