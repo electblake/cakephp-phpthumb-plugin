@@ -80,7 +80,7 @@ class CakePhpThumb {
 				
         if($this->error)    {
             $this->thumb_data['error_detail'] = $this->error_detail;
-    				trigger_error($this->error_detail, E_USER_NOTICE);	
+    				trigger_error('Something Went Wrong.'.$this->error_detail, E_USER_NOTICE);	
             $this->thumb_data['src'] = $this->options['error_image_path'];
         } else    {
             $this->thumb_data['src'] = $this->options['display_path'] . '/' . substr($this->cache_filename, strrpos($this->cache_filename, DS) + 1, strlen($this->cache_filename));
